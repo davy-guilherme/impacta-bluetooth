@@ -67,6 +67,20 @@ class CallbacksDeCaracteristica: public BLECharacteristicCallbacks {
 };
 
 
+class MyServerCallbacks : public BLEServerCallbacks {
+  void onConnect(BLEServer *servidor) {
+    Serial.println("Conectado - BL");
+    // Handle device connection
+  }
+
+  void onDisconnect(BLEServer *servidor) {
+    // Handle device disconnection and trigger reconnection
+    Serial.println("Aberto para conexoes BL");
+    servidor->getAdvertising()->start();
+  }
+};
+
+
 void setup() {
   Serial.begin(115200);
 
@@ -76,6 +90,8 @@ void setup() {
   BLEDevice::init("ESP32");
 
   BLEServer *servidor = BLEDevice::createServer();
+  
+  servidor->setCallbacks( new MyServerCallbacks() );
 
   BLEService *servico = servidor->createService(UUID_SER);
 
@@ -87,6 +103,7 @@ void setup() {
 
   servidor->getAdvertising()->addServiceUUID(UUID_SER);
 
+  Serial.println("Aberto para conexoes BL - PRIMEIRA");
   servidor->getAdvertising()->start();
 
 }
